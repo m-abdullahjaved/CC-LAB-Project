@@ -1,11 +1,13 @@
-num i -> 1 .
-i -> 60 .
-i -> i div 2 .
-agar ( i lesser 100 ) {
-i -> 5 .
-a -> 20 .
+num a -> 60 .
+agar ( a lte 60 ) {
+a -> 10000 .
 }
 warna {
-i -> 100 .
-a -> 20 .
+a -> 50 .
+}
+agar ( 10 lesser 10 ) {
+num b .
+}
+warna {
+num c .
 }

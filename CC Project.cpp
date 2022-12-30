@@ -9,8 +9,8 @@
 #include <vector> 
 
 #define EQUAL_TO "->" 
-#define COMMA "," 
-#define DOT "." 
+#define COMMA ","
+#define DOT "."
 #define OPEN_PAREN "(" 
 #define CLOS_PAREN ")" 
 #define OPEN_BRACE "{" 
@@ -109,6 +109,12 @@ bool evaluateCondition(string op1, string op2, string op) {
 	}
 	else if (op == "lte") {
 		return Op1 <= Op2;
+	}
+	else if (op == "equal") {
+		return Op1 == Op2;
+	}
+	else if (op == "neq") {
+		return Op1 != Op2;
 	}
 	return false;
 }
@@ -685,8 +691,7 @@ public:
 				cout << setw(50) << ins << "[Condition Ends]"
 					<< endl;
 				agarCond = false;
-			}
-			
+			}		
 			else if (warnaCondition(ins)) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
