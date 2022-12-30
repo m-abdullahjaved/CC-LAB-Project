@@ -1,5 +1,5 @@
 // UPDATED by M. Abdullah Javed 
-// 12:45 AM [31/12/2022]
+// 01:17 AM [31/12/2022]
 
 #include <iostream> 
 #include <fstream> 
@@ -592,9 +592,10 @@ public:
 	Semantic() { mInstruction = {}; }
 	Semantic(vector<string> pIns) { mInstruction = pIns; }
 	void semanticAnalysis() {
-		bool agarCond = false;
-		bool warnaCond = false;
+		bool agarCond = false; // for printing
+		bool warnaCond = false; // for printing
 		bool karoCond = false;
+		//bool isCondTrue = false; // for checking condition (then or else part)
 		int i = 1;
 		//for (auto ins : mInstruction) {
 		for (int j = 0; j < mInstruction.size(); j++) {
@@ -665,6 +666,33 @@ public:
 
 				bool isCondTrue = evaluateCondition(op1, op2, op);
 				if (!isCondTrue) {
+					agarCond = false;
+					warnaCond = true; // Run else Part by ignoring then part
+					while (mInstruction[j] != CLOS_BRACE) {
+						j++; // Statement Incremented
+						i++; // Line Incremented
+						cout << left << setw(3) << i << setfill(' ')
+							<< ": ";
+						cout << setw(50) << mInstruction[j] << "[Not Executed]" <<
+							endl;
+					}
+					
+				}
+			}
+			else if (ins == CLOS_BRACE && agarCond && !warnaCond) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Condition Ends]"
+					<< endl;
+				agarCond = false;
+			}
+			
+			else if (warnaCondition(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Warna Start]"
+					<< endl;
+				if (!warnaCond) {
 					while (mInstruction[j] != CLOS_BRACE) {
 						j++; // Statement Incremented
 						i++; // Line Incremented
@@ -674,28 +702,12 @@ public:
 							endl;
 					}
 				}
-			}
-		
-			
-			else if (ins == CLOS_BRACE && agarCond && warnaCond == false) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Condition Ends]"
-					<< endl;
-				agarCond = false;
-			}
-			
-			else if (warnaCondition(ins)) {
-				warnaCond = true;
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Else Start]"
-					<< endl;
+				
 			}
 			else if (ins == CLOS_BRACE && warnaCond == true) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
-				cout << setw(50) << ins << "[Else Ends]"
+				cout << setw(50) << ins << "[Warna Ends]"
 					<< endl;
 				warnaCond = false;
 			}

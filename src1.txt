@@ -5,3 +5,7 @@ agar ( i lesser 100 ) {
 i -> 5 .
 a -> 20 .
 }
+warna {
+i -> 100 .
+a -> 20 .
+}
