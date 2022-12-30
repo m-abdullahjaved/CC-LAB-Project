@@ -1,0 +1,25 @@
+// dec i .
+dec j -> 10 .
+num b .
+num c -> 10 plus 15 plus 20 .
+j -> j minus 5 mul 6 .
+agar ( i gte 10 and 5 lesser 10 ) {
+i -> 5 .
+}
+warna {
+i -> 10 .
+}
+agar ( b equal c ) {
+j -> 4 .
+}
+warna {
+alpha d .
+}
+jab_tak ( c lesser 5 ) {
+c -> c plus 1 .
+}
+jab_tak ( a gte 1 ) {
+agar ( c greater 5 ) {
+a -> a minus 1 .
+}
+}
