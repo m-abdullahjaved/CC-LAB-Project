@@ -1,5 +1,5 @@
 // UPDATED by M. Abdullah Javed 
-// 11.20PM [30/12/2022]
+// 12:45 AM [31/12/2022]
 
 #include <iostream> 
 #include <fstream> 
@@ -94,6 +94,23 @@ string evaluateExp(string a, string b, string op) {
 		return to_string(op1 / op2);
 
 	return "-1";
+}
+bool evaluateCondition(string op1, string op2, string op) {
+	int Op1 = stoi(op1);
+	int Op2 = stoi(op2);
+	if (op == "greater") {
+		return Op1 > Op2;
+	}
+	else if (op == "lesser") {
+		return Op1 < Op2;
+	}
+	else if (op == "gte") {
+		return Op1 >= Op2;
+	}
+	else if (op == "lte") {
+		return Op1 <= Op2;
+	}
+	return false;
 }
 
 class Node {
@@ -198,7 +215,6 @@ public:
 		}
 		return temp;
 	}
-
 	bool deleteIdentifier(string id) {
 		if (head == NULL)
 			return false;
@@ -580,7 +596,9 @@ public:
 		bool warnaCond = false;
 		bool karoCond = false;
 		int i = 1;
-		for (auto ins : mInstruction) {
+		//for (auto ins : mInstruction) {
+		for (int j = 0; j < mInstruction.size(); j++) {
+			string ins = mInstruction[j];
 			if (isDeclaration(ins)) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
@@ -621,8 +639,44 @@ public:
 					<< ": ";
 				cout << setw(50) << ins << "[Condition Starts]"
 					<< endl;
-				//createSymbolTable(ins, i);
+
+				vector<Token> mTokens = tokenizeInstruction(ins);
+				string op1 = mTokens[2].getToken();
+				string op2 = mTokens[4].getToken();
+				string op = mTokens[3].getToken();
+				if (isIdentifier(op1)) {
+					Node* ref = Table.searchIdentifier(op1);
+					if (ref)
+						op1 = ref->getValue();
+					else {
+						cout << "ERROR=> " << op1 << " not declared\n";
+						return;
+					}
+				}
+				if (isIdentifier(op2)) {
+					Node* ref = Table.searchIdentifier(op2);
+					if (ref)
+						op2 = ref->getValue();
+					else {
+						cout << "ERROR=> " << op2 << " not declared\n";
+						return;
+					}
+				}
+
+				bool isCondTrue = evaluateCondition(op1, op2, op);
+				if (!isCondTrue) {
+					while (mInstruction[j] != CLOS_BRACE) {
+						j++; // Statement Incremented
+						i++; // Line Incremented
+						cout << left << setw(3) << i << setfill(' ')
+							<< ": ";
+						cout << setw(50) << mInstruction[j] << "[Not Executed]" <<
+							endl;
+					}
+				}
 			}
+		
+			
 			else if (ins == CLOS_BRACE && agarCond && warnaCond == false) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
@@ -630,6 +684,7 @@ public:
 					<< endl;
 				agarCond = false;
 			}
+			
 			else if (warnaCondition(ins)) {
 				warnaCond = true;
 				cout << left << setw(3) << i << setfill(' ')
@@ -778,6 +833,7 @@ void readFile(string fileName) {
 					mInstruction.push_back(line);
 			}
 		}
+
 		// Lexer will generate lexemes of instructions 
 		Lexer lex(mInstruction);
 		mInstruction = lex.lexicalAnalysis();

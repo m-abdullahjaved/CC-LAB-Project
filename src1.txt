@@ -1,3 +1,7 @@
 num i -> 1 .
 i -> 60 .
 i -> i div 2 .
+agar ( i lesser 100 ) {
+i -> 5 .
+a -> 20 .
+}
