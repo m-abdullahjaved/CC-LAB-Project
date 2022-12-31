@@ -4,7 +4,7 @@
 - (Agar- Warna) if-else execution added.
 - Variable must be declared before use.
 - Avoid multiple declarations.
-
+- karo Loop implemented.
 */
 
 
@@ -609,6 +609,7 @@ public:
 		bool warnaCond = false; // for printing
 		bool karoCond = false;
 		int i = 1;
+		int savedLine = 0;
 		//for (auto ins : mInstruction) {
 		for (int j = 0; j < mInstruction.size(); j++) {
 			string ins = mInstruction[j];
@@ -723,17 +724,59 @@ public:
 				warnaCond = false;
 			}
 			else if (Condition(ins, "jab_tak")) {
-				karoCond = true;
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
 				cout << setw(50) << ins << "[Loop Starts]"
 					<< endl;
+
+				vector<Token> mTokens = tokenizeInstruction(ins);
+				string op1 = mTokens[2].getToken();
+				string op2 = mTokens[4].getToken();
+				string op = mTokens[3].getToken();
+				if (isIdentifier(op1)) {
+					Node* ref = Table.searchIdentifier(op1);
+					if (ref)
+						op1 = ref->getValue();
+					else {
+						cout << "ERROR=> " << op1 << " not declared\n";
+						return;
+					}
+				}
+				if (isIdentifier(op2)) {
+					Node* ref = Table.searchIdentifier(op2);
+					if (ref)
+						op2 = ref->getValue();
+					else {
+						cout << "ERROR=> " << op2 << " not declared\n";
+						return;
+					}
+				}
+
+				bool isCondTrue = evaluateCondition(op1, op2, op);
+				
+				if (!isCondTrue) {
+					karoCond = false;
+					while (mInstruction[j] != CLOS_BRACE) {
+						j++; // Statement Incremented
+						i++; // Line Incremented
+						cout << left << setw(3) << i << setfill(' ')
+							<< ": ";
+						cout << setw(50) << mInstruction[j] << "[Not Executed]" <<
+							endl;
+					}
+				}
+				else {
+					karoCond = true;
+					savedLine = j - 1; // save the current line for direct return
+				}
 			}
 			else if (ins == CLOS_BRACE && karoCond) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
 				cout << setw(50) << ins << "[Loop Ends]"
 					<< endl;
+				j = savedLine;
+				i = savedLine + 1;
 				karoCond = false;
 			}
 			else {
@@ -868,8 +911,9 @@ void readFile(string fileName) {
 		Lexer lex(mInstruction);
 		mInstruction = lex.lexicalAnalysis();
 		Semantic Sem(mInstruction);
+		cout << "Executable Statements\n\n";
 		Sem.semanticAnalysis();
-		cout << endl << endl;
+		cout << endl << "Symbol Table: " << endl;
 		Sem.printSymbolTable();
 		//close the file 
 		file.close();
