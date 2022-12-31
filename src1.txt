@@ -5,9 +5,10 @@ a -> 10000 .
 warna {
 a -> 50 .
 }
-agar ( 10 lesser 10 ) {
+agar ( 10 lesser 11 ) {
 num b .
 }
 warna {
+num c .
 num c .
 }

@@ -1,5 +1,12 @@
 // UPDATED by M. Abdullah Javed 
 // 01:17 AM [31/12/2022]
+/*
+- (Agar- Warna) if-else execution added.
+- Variable must be declared before use.
+- Avoid multiple declarations.
+
+*/
+
 
 #include <iostream> 
 #include <fstream> 
@@ -601,7 +608,6 @@ public:
 		bool agarCond = false; // for printing
 		bool warnaCond = false; // for printing
 		bool karoCond = false;
-		//bool isCondTrue = false; // for checking condition (then or else part)
 		int i = 1;
 		//for (auto ins : mInstruction) {
 		for (int j = 0; j < mInstruction.size(); j++) {
@@ -743,8 +749,15 @@ public:
 		vector<Token> mTokens = tokenizeInstruction(line);
 		Node* temp = new Node;
 		if (isDeclaration(line)) {
-			Table.insertNode(mTokens[0].getToken(),
-				mTokens[1].getToken(), "", line_no);
+			string type = mTokens[0].getToken();
+			string id = mTokens[1].getToken();
+			Node* ref = Table.searchIdentifier(id);
+			if (!ref)
+				Table.insertNode(type, id, "", line_no);
+			else {
+				cout << id << " is already declared\n";
+				return;
+			}
 		}
 		else if (isDefinition_Declaration(line)) {
 			Table.insertNode(mTokens[0].getToken(),
