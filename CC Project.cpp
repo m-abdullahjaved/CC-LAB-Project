@@ -604,6 +604,92 @@ class Semantic {
 public:
 	Semantic() { mInstruction = {}; }
 	Semantic(vector<string> pIns) { mInstruction = pIns; }
+	void printCode() {
+		bool agarCond = false; // for printing
+		bool warnaCond = false; // for printing
+		bool karoCond = false;
+		int i = 1;
+		int savedLine = 0;
+		for (int j = 0; j < mInstruction.size(); j++) {
+			string ins = mInstruction[j];
+			if (isDeclaration(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Declaration Statement]" <<
+					endl;
+			}
+			else if (isDefinition(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Definition Statement]" << endl;
+			}
+			else if (isDefinition_Declaration(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Declare + Define Statement]"
+					<< endl;
+			}
+			else if (isDecDefMan(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Dec + Def + Manup Statement]"
+					<< endl;
+			}
+			else if (isManupulation(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Manupulation Statement]" <<
+					endl;
+			}
+			else if (Condition(ins, "agar")) {
+				agarCond = true;
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Condition Starts]"
+					<< endl;
+			}
+			else if (ins == CLOS_BRACE && agarCond && !warnaCond) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Condition Ends]"
+					<< endl;
+				agarCond = false;
+			}
+			else if (warnaCondition(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Warna Start]"
+					<< endl;
+			}
+			else if (ins == CLOS_BRACE && warnaCond == true) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Warna Ends]"
+					<< endl;
+				warnaCond = false;
+			}
+			else if (Condition(ins, "jab_tak")) {
+				karoCond = true;
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Loop Starts]"
+					<< endl;
+			}
+			else if (ins == CLOS_BRACE && karoCond) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Loop Ends]"
+					<< endl;
+			}
+			else {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Something Else]"
+					<< endl;
+			}
+			i++;
+		}
+	}
 	void semanticAnalysis() {
 		bool agarCond = false; // for printing
 		bool warnaCond = false; // for printing
@@ -614,45 +700,34 @@ public:
 		for (int j = 0; j < mInstruction.size(); j++) {
 			string ins = mInstruction[j];
 			if (isDeclaration(ins)) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Declaration Statement]" <<
-					endl;
+			//	cout << left << setw(3) << i << setfill(' ') << ": ";
+			//	cout << setw(50) << ins << "[Declaration Statement]" << endl;
 				createSymbolTable(ins, i);
 			}
 			else if (isDefinition(ins)) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Definition Statement]" << endl;
+				//cout << left << setw(3) << i << setfill(' ') << ": ";
+				//cout << setw(50) << ins << "[Definition Statement]" << endl;
 				createSymbolTable(ins, i);
 			}
 			else if (isDefinition_Declaration(ins)) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Declare + Define Statement]"
-					<< endl;
+				//cout << left << setw(3) << i << setfill(' ') << ": ";
+				//cout << setw(50) << ins << "[Declare + Define Statement]" << endl;
 				createSymbolTable(ins, i);
 			}
 			else if (isDecDefMan(ins)) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Dec + Def + Manup Statement]"
-					<< endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				// cout << setw(50) << ins << "[Dec + Def + Manup Statement]" << endl;
 				createSymbolTable(ins, i);
 			}
 			else if (isManupulation(ins)) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Manupulation Statement]" <<
-					endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				// cout << setw(50) << ins << "[Manupulation Statement]" << endl;
 				createSymbolTable(ins, i);
 			}
 			else if (Condition(ins, "agar")) {
 				agarCond = true;
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Condition Starts]"
-					<< endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				//cout << setw(50) << ins << "[Condition Starts]" << endl;
 
 				vector<Token> mTokens = tokenizeInstruction(ins);
 				string op1 = mTokens[2].getToken();
@@ -664,7 +739,7 @@ public:
 						op1 = ref->getValue();
 					else {
 						cout << "ERROR=> " << op1 << " not declared\n";
-						return;
+						exit(0);
 					}
 				}
 				if (isIdentifier(op2)) {
@@ -673,7 +748,7 @@ public:
 						op2 = ref->getValue();
 					else {
 						cout << "ERROR=> " << op2 << " not declared\n";
-						return;
+						exit(0);
 					}
 				}
 
@@ -684,50 +759,38 @@ public:
 					while (mInstruction[j] != CLOS_BRACE) {
 						j++; // Statement Incremented
 						i++; // Line Incremented
-						cout << left << setw(3) << i << setfill(' ')
-							<< ": ";
-						cout << setw(50) << mInstruction[j] << "[Not Executed]" <<
-							endl;
+						// cout << left << setw(3) << i << setfill(' ') << ": ";
+						// cout << setw(50) << mInstruction[j] << "[Not Executed]" << endl;
 					}
 					
 				}
 			}
 			else if (ins == CLOS_BRACE && agarCond && !warnaCond) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Condition Ends]"
-					<< endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				//cout << setw(50) << ins << "[Condition Ends]" << endl;
 				agarCond = false;
 			}		
 			else if (warnaCondition(ins)) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Warna Start]"
-					<< endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				// cout << setw(50) << ins << "[Warna Start]" << endl;
 				if (!warnaCond) {
 					while (mInstruction[j] != CLOS_BRACE) {
 						j++; // Statement Incremented
 						i++; // Line Incremented
-						cout << left << setw(3) << i << setfill(' ')
-							<< ": ";
-						cout << setw(50) << mInstruction[j] << "[Not Executed]" <<
-							endl;
+						// cout << left << setw(3) << i << setfill(' ') << ": ";
+						// cout << setw(50) << mInstruction[j] << "[Not Executed]" << endl;
 					}
 				}
 				
 			}
 			else if (ins == CLOS_BRACE && warnaCond == true) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Warna Ends]"
-					<< endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				// cout << setw(50) << ins << "[Warna Ends]" << endl;
 				warnaCond = false;
 			}
 			else if (Condition(ins, "jab_tak")) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Loop Starts]"
-					<< endl;
+				//cout << left << setw(3) << i << setfill(' ') << ": ";
+				//cout << setw(50) << ins << "[Loop Starts]" << endl;
 
 				vector<Token> mTokens = tokenizeInstruction(ins);
 				string op1 = mTokens[2].getToken();
@@ -739,7 +802,7 @@ public:
 						op1 = ref->getValue();
 					else {
 						cout << "ERROR=> " << op1 << " not declared\n";
-						return;
+						exit(0);
 					}
 				}
 				if (isIdentifier(op2)) {
@@ -748,7 +811,7 @@ public:
 						op2 = ref->getValue();
 					else {
 						cout << "ERROR=> " << op2 << " not declared\n";
-						return;
+						exit(0);
 					}
 				}
 
@@ -759,10 +822,8 @@ public:
 					while (mInstruction[j] != CLOS_BRACE) {
 						j++; // Statement Incremented
 						i++; // Line Incremented
-						cout << left << setw(3) << i << setfill(' ')
-							<< ": ";
-						cout << setw(50) << mInstruction[j] << "[Not Executed]" <<
-							endl;
+						//cout << left << setw(3) << i << setfill(' ') << ": ";
+						//cout << setw(50) << mInstruction[j] << "[Not Executed]" << endl;
 					}
 				}
 				else {
@@ -771,19 +832,15 @@ public:
 				}
 			}
 			else if (ins == CLOS_BRACE && karoCond) {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Loop Ends]"
-					<< endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				// cout << setw(50) << ins << "[Loop Ends]" << endl;
 				j = savedLine;
 				i = savedLine + 1;
 				karoCond = false;
 			}
 			else {
-				cout << left << setw(3) << i << setfill(' ')
-					<< ": ";
-				cout << setw(50) << ins << "[Something Else]"
-					<< endl;
+				// cout << left << setw(3) << i << setfill(' ') << ": ";
+				// cout << setw(50) << ins << "[Something Else]" << endl;
 			}
 			i++;
 		}
@@ -799,7 +856,7 @@ public:
 				Table.insertNode(type, id, "", line_no);
 			else {
 				cout << id << " is already declared\n";
-				return;
+				exit(0);
 			}
 		}
 		else if (isDefinition_Declaration(line)) {
@@ -816,8 +873,10 @@ public:
 				Table.insertNode("", identifier, value,
 					line_no, reference);
 			}
-			else
+			else {
 				cout << "ERROR: Identifier is not declared\n";
+				exit(0);
+			}
 		}
 		else if (isManupulation(line)) {
 			string identifier = mTokens[0].getToken();
@@ -832,7 +891,7 @@ public:
 						op1 = ref->getValue();
 					else {
 						cout << "ERROR: " << op1 << " is not declared\n";
-						return;
+						exit(0);
 					}
 					
 				}
@@ -842,14 +901,16 @@ public:
 						op2 = ref->getValue();
 					else {
 						cout << "ERROR: " << op2 << " is not declared\n";
-						return;
+						exit(0);
 					}
 				}
 				string val = evaluateExp(op1, op2, op);
 				Table.insertNode("", identifier, val, line_no, line_ref);
 			}
-			else
+			else {
 				cout << "ERROR: Identifier is not declared\n";
+				exit(0);
+			}
 		}
 		line_no++;
 	}
@@ -911,7 +972,9 @@ void readFile(string fileName) {
 		Lexer lex(mInstruction);
 		mInstruction = lex.lexicalAnalysis();
 		Semantic Sem(mInstruction);
-		cout << "Executable Statements\n\n";
+		cout << "Code:\n";
+		Sem.printCode();
+		//cout << "Executable Statements\n\n";
 		Sem.semanticAnalysis();
 		cout << endl << "Symbol Table: " << endl;
 		Sem.printSymbolTable();

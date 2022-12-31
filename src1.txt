@@ -1,11 +1,4 @@
-num a -> 60 .
-agar ( a lte 60 ) {
-a -> 10000 .
-}
-warna {
-a -> 50 .
-}
-a -> 10 .
-jab_tak ( a gte 1 ) {
-a -> a minus 1 .
+num i -> 1 .
+jab_tak ( i lte 100 ) {
+i -> i plus 2 . 
 }
