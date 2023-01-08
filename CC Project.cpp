@@ -1,5 +1,5 @@
 // UPDATED by M. Abdullah Javed 
-// 03:32 PM [08/01/2023]
+// 06:59 PM [08/01/2023]
 
 
 
@@ -23,7 +23,7 @@ bool isOperator(string str) {
 	vector<string> operators = { "plus", "minus", "mul", "div",
 	"equal", "lesser", "gte", "lte",
 	"greater", "neq", "not", "or", "and",
-   "plus->", "minus->", "div->", "mul->" };
+   "plus->", "minus->", "div->", "mul->", ":"};
 	for (auto x : operators) {
 		if (x == str)
 			return true;
@@ -33,7 +33,7 @@ bool isOperator(string str) {
 bool isKeyword(string str) {
 	vector<string> keywords = { "agar", "warna agar",
 	"fixed", "warna",
-	 "karo", "jab_tak" };
+	 "karo", "jab_tak", "switch", "case", "break" };
 	for (auto x : keywords) {
 		if (str == x)
 			return true;
@@ -66,7 +66,7 @@ bool isSpecialChar(char str) {
 	return false;
 }
 bool isIdentifier(string pTok) {
-	if (isDataType(pTok)) {
+	if (isDataType(pTok) || isOperator(pTok)) {
 		return false;
 	}
 	if (pTok[0] == '@' || pTok[0] == '$' || isalpha(pTok[0])) {
@@ -120,6 +120,10 @@ bool evaluateCondition(string op1, string op2, string op) {
 	}
 	return false;
 }
+
+class TAC; // Forward Declaration
+vector<TAC> vectorTAC;
+void extractTAC(string);
 
 class Node {
 	string Identifer, Type, Value;
@@ -595,6 +599,49 @@ class Semantic {
 		}
 		return false;
 	}
+	bool switchStatement(string pInst) {
+		vector<Token>mTokens = tokenizeInstruction(pInst);
+		int DFA = 0;
+		for (auto x : mTokens) {
+			if (DFA == 0 && x.getToken() == "switch") {
+				DFA = 1;
+			}
+			else if (DFA == 1 && x.getToken() == OPEN_PAREN) {
+				DFA = 2;
+			}
+			else if (DFA == 2 && isIdentifier(x.getToken())) {
+				DFA = 3;
+			}
+			else if (DFA == 3 && x.getToken() == CLOS_PAREN) {
+				DFA = 4;
+			}
+			else if (DFA == 4 && x.getToken() == OPEN_BRACE) {
+				DFA = 0;
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	bool caseStatement(string pInst) {
+		vector<Token>mTokens = tokenizeInstruction(pInst);
+		int DFA = 0;
+		for (auto x : mTokens) {
+			if (DFA == 0 && x.getToken() == "case") {
+				DFA = 1;
+			}
+			else if (DFA == 1 && isConstant(x.getToken())) {
+				DFA = 2;
+			}
+			else if (DFA == 2 && x.getToken() == ":") {
+				DFA = 0;
+				return true;
+			}
+			else
+				return false;
+		}
+	}
 	SymbolTable Table;
 public:
 	Semantic() { mInstruction = {}; }
@@ -603,6 +650,7 @@ public:
 		bool agarCond = false; // for printing
 		bool warnaCond = false; // for printing
 		bool karoCond = false;
+		bool switchStat = false;
 		int i = 1;
 		int savedLine = 0;
 		for (int j = 0; j < mInstruction.size(); j++) {
@@ -643,6 +691,13 @@ public:
 				cout << setw(50) << ins << "[Condition Starts]"
 					<< endl;
 			}
+			else if (switchStatement(ins)) {
+				switchStat = true;
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Switch Starts]"
+					<< endl;
+			}
 			else if (ins == CLOS_BRACE && agarCond && !warnaCond) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
@@ -650,11 +705,24 @@ public:
 					<< endl;
 				agarCond = false;
 			}
+			else if (ins == CLOS_BRACE && switchStat) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Switch Ends]"
+					<< endl;
+				switchStat = false;
+			}
 			else if (warnaCondition(ins)) {
 				warnaCond = true;
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
 				cout << setw(50) << ins << "[Warna Start]"
+					<< endl;
+			}
+			else if (caseStatement(ins)) {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Case Statement]"
 					<< endl;
 			}
 			else if (ins == CLOS_BRACE && warnaCond) {
@@ -761,6 +829,24 @@ public:
 
 				}
 			}
+			else if (switchStatement(ins)) {
+				vector<Token> mTokens = tokenizeInstruction(ins);
+				string id = mTokens[2].getToken();
+				Node* ref = Table.searchIdentifier(id);
+				if (!ref) {
+					cout << id << " is not declared\n";
+					exit(0);
+				}
+				string val = ref->getValue();
+
+				while (mInstruction[j] != CLOS_BRACE) {
+					vector<Token> mTokens = tokenizeInstruction(mInstruction[j]);
+					if (mTokens[1].getToken() == val) {
+						break;
+					}
+					j++;
+				}
+			}
 			else if (ins == CLOS_BRACE && agarCond && !warnaCond) {
 				// cout << left << setw(3) << i << setfill(' ') << ": ";
 				//cout << setw(50) << ins << "[Condition Ends]" << endl;
@@ -827,6 +913,11 @@ public:
 					savedLine = j - 1; // save the current line for direct return
 				}
 			}
+			else if (ins == "break .") {
+				while (mInstruction[j] != CLOS_BRACE) {
+					j++;
+				}
+			}
 			else if (ins == CLOS_BRACE && karoCond) {
 				// cout << left << setw(3) << i << setfill(' ') << ": ";
 				// cout << setw(50) << ins << "[Loop Ends]" << endl;
@@ -839,8 +930,8 @@ public:
 				// cout << setw(50) << ins << "[Something Else]" << endl;
 			}
 			i++;
+			}
 		}
-	}
 	void createSymbolTable(string line, int line_no) {
 		vector<Token> mTokens = tokenizeInstruction(line);
 		Node* temp = new Node;
@@ -856,9 +947,16 @@ public:
 			}
 		}
 		else if (isDefinition_Declaration(line)) {
-			Table.insertNode(mTokens[0].getToken(),
-				mTokens[1].getToken(), mTokens[3].getToken(),
-				line_no);
+			string id = mTokens[1].getToken();
+			Node* ref = Table.searchIdentifier(id);
+			if (!ref)
+				Table.insertNode(mTokens[0].getToken(),
+					id, mTokens[3].getToken(),
+					line_no);
+			else {
+				cout << id << " is already declared\n";
+				exit(0);
+			}
 		}
 		else if (isDefinition(line)) {
 			string identifier = mTokens[0].getToken();
@@ -881,6 +979,7 @@ public:
 				string op1 = mTokens[2].getToken();
 				string op2 = mTokens[4].getToken();
 				string op = mTokens[3].getToken(); //operator
+				extractTAC(op1 + " " + op2 + " " + op);
 				if (isIdentifier(op1)) {
 					Node* ref = Table.searchIdentifier(op1);
 					if (ref)
@@ -889,7 +988,6 @@ public:
 						cout << "ERROR: " << op1 << " is not declared\n";
 						exit(0);
 					}
-
 				}
 				if (isIdentifier(op2)) {
 					Node* ref = Table.searchIdentifier(op2);
@@ -981,7 +1079,6 @@ void readFile(string fileName) {
 		cout << "File is not opened!\n";
 	}
 }
-
 class TAC {
 public:
 	Token Operator;
@@ -1001,18 +1098,17 @@ public:
 			<< Ref[0] << "\t" << Ref[1] << endl;
 	}
 };
-vector<TAC> extractTAC(string postFix) {
-	vector<TAC> vectorTAC;
+void extractTAC(string postFix) {
 	stack<string> strStack;
 	stack<TAC> TacStack;
 	string operand1, operand2, oper;
-	for (char i : postFix) {
+	vector<Token> mTokens = tokenizeInstruction(postFix);
+	for (Token i : mTokens) {
 		TAC tak;
-		string temp(1, i);
-		if (isIdentifier(temp))
-			strStack.push(temp);
-		else if (isOperator(temp)) {
-			tak.Operator = temp;
+		if (isIdentifier(i.getToken()) || isConstant(i.getToken()))
+			strStack.push(i.getToken());
+		else if (isOperator(i.getToken())) {
+			tak.Operator = i.getToken();
 			if (!strStack.empty()) {
 				operand2 = strStack.top();
 				strStack.pop();
@@ -1037,14 +1133,14 @@ vector<TAC> extractTAC(string postFix) {
 			vectorTAC.push_back(tak);
 		}
 	}
-	return vectorTAC;
 }
+
 
 int main() {
 	readFile("src1.txt");
-	cout << "Op1\tOp2\tOp\tRef1\t\t\tRef2\t\n";
+	cout << "Three Address Code\nOp1\tOp2\tOp\tRef1\t\t\tRef2\t\n";
 	//vector<TAC> tacVector = extractTAC(postFix);
-	//for (TAC i : tacVector)
-	//	//i.printTAC();
+	for (TAC i : vectorTAC)
+		i.printTAC();
 	return 0;
 }

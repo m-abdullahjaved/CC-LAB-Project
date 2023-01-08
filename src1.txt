@@ -1,7 +1,11 @@
-num x -> 0 .
-num i -> 10 .
-num a -> 0 .
-jab_tak ( x lesser 5 ) {
-i -> 2 plus i .
-x -> x plus 1 .
+num i -> 2 .
+switch ( i ) {
+case 0 :
+num a .
+case 1 :
+i -> i plus 1 .
+num b .
+break .
+case 2 :
+dec Abdullah .
 }
