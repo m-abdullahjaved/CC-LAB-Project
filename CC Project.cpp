@@ -31,9 +31,9 @@ bool isOperator(string str) {
 	return false;
 }
 bool isKeyword(string str) {
-	vector<string> keywords = { "agar", "warna agar",
+	vector<string> keywords = { "agar", "warna_agar",
 	"fixed", "warna",
-	 "karo", "jab_tak", "switch", "case", "break" };
+	 "karo", "jab_tak", "switch", "case", "niklo" };
 	for (auto x : keywords) {
 		if (str == x)
 			return true;
@@ -698,6 +698,12 @@ public:
 				cout << setw(50) << ins << "[Switch Starts]"
 					<< endl;
 			}
+			else if (ins == "niklo .") {
+				cout << left << setw(3) << i << setfill(' ')
+					<< ": ";
+				cout << setw(50) << ins << "[Break Statement]"
+					<< endl;
+			}
 			else if (ins == CLOS_BRACE && agarCond && !warnaCond) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
@@ -913,7 +919,7 @@ public:
 					savedLine = j - 1; // save the current line for direct return
 				}
 			}
-			else if (ins == "break .") {
+			else if (ins == "niklo .") {
 				while (mInstruction[j] != CLOS_BRACE) {
 					j++;
 				}

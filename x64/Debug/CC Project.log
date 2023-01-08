@@ -1,4 +1,4 @@
 ﻿  CC Project.cpp
-C:\Users\Abdullah Javed\source\repos\CC Project\CC Project.cpp(644): warning C4715: 'Semantic::caseStatement': not all control paths return a value
 C:\Users\Abdullah Javed\source\repos\CC Project\CC Project.cpp(626): warning C4715: 'Semantic::switchStatement': not all control paths return a value
+C:\Users\Abdullah Javed\source\repos\CC Project\CC Project.cpp(644): warning C4715: 'Semantic::caseStatement': not all control paths return a value
   CC Project.vcxproj -> C:\Users\Abdullah Javed\source\repos\CC Project\x64\Debug\CC Project.exe

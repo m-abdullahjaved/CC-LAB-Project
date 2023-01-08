@@ -1,11 +1,11 @@
-num i -> 2 .
+num i -> 1 .
 switch ( i ) {
 case 0 :
 num a .
 case 1 :
 i -> i plus 1 .
 num b .
-break .
+niklo .
 case 2 :
 dec Abdullah .
 }
