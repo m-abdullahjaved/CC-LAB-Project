@@ -1,4 +1,7 @@
-num i -> 1 .
-jab_tak ( i lte 100 ) {
-i -> i plus 2 . 
+num x -> 0 .
+num i -> 10 .
+num a -> 0 .
+jab_tak ( x lesser 5 ) {
+i -> 2 plus i .
+x -> x plus 1 .
 }

@@ -1,9 +1,9 @@
-// dec i .
+dec i .
 dec j -> 10 .
 num b .
 num c -> 10 plus 15 plus 20 .
 j -> j minus 5 mul 6 .
-agar ( i gte 10 and 5 lesser 10 ) {
+agar ( i gte 10 ) {
 i -> 5 .
 }
 warna {

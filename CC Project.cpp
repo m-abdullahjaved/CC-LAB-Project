@@ -1,11 +1,6 @@
 // UPDATED by M. Abdullah Javed 
-// 01:17 AM [31/12/2022]
-/*
-- (Agar- Warna) if-else execution added.
-- Variable must be declared before use.
-- Avoid multiple declarations.
-- karo Loop implemented.
-*/
+// 03:32 PM [08/01/2023]
+
 
 
 #include <iostream> 
@@ -328,7 +323,7 @@ public:
 		else if (tok == OPEN_BRACE || tok == CLOS_BRACE || tok
 			== OPEN_PAREN
 			|| tok == CLOS_PAREN || tok == COMMA || tok ==
-			EQUAL_TO ) {
+			EQUAL_TO) {
 			pTok.setValid(true);
 		}
 		else
@@ -656,12 +651,13 @@ public:
 				agarCond = false;
 			}
 			else if (warnaCondition(ins)) {
+				warnaCond = true;
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
 				cout << setw(50) << ins << "[Warna Start]"
 					<< endl;
 			}
-			else if (ins == CLOS_BRACE && warnaCond == true) {
+			else if (ins == CLOS_BRACE && warnaCond) {
 				cout << left << setw(3) << i << setfill(' ')
 					<< ": ";
 				cout << setw(50) << ins << "[Warna Ends]"
@@ -700,8 +696,8 @@ public:
 		for (int j = 0; j < mInstruction.size(); j++) {
 			string ins = mInstruction[j];
 			if (isDeclaration(ins)) {
-			//	cout << left << setw(3) << i << setfill(' ') << ": ";
-			//	cout << setw(50) << ins << "[Declaration Statement]" << endl;
+				//	cout << left << setw(3) << i << setfill(' ') << ": ";
+				//	cout << setw(50) << ins << "[Declaration Statement]" << endl;
 				createSymbolTable(ins, i);
 			}
 			else if (isDefinition(ins)) {
@@ -762,14 +758,14 @@ public:
 						// cout << left << setw(3) << i << setfill(' ') << ": ";
 						// cout << setw(50) << mInstruction[j] << "[Not Executed]" << endl;
 					}
-					
+
 				}
 			}
 			else if (ins == CLOS_BRACE && agarCond && !warnaCond) {
 				// cout << left << setw(3) << i << setfill(' ') << ": ";
 				//cout << setw(50) << ins << "[Condition Ends]" << endl;
 				agarCond = false;
-			}		
+			}
 			else if (warnaCondition(ins)) {
 				// cout << left << setw(3) << i << setfill(' ') << ": ";
 				// cout << setw(50) << ins << "[Warna Start]" << endl;
@@ -781,7 +777,7 @@ public:
 						// cout << setw(50) << mInstruction[j] << "[Not Executed]" << endl;
 					}
 				}
-				
+
 			}
 			else if (ins == CLOS_BRACE && warnaCond == true) {
 				// cout << left << setw(3) << i << setfill(' ') << ": ";
@@ -816,7 +812,7 @@ public:
 				}
 
 				bool isCondTrue = evaluateCondition(op1, op2, op);
-				
+
 				if (!isCondTrue) {
 					karoCond = false;
 					while (mInstruction[j] != CLOS_BRACE) {
@@ -893,7 +889,7 @@ public:
 						cout << "ERROR: " << op1 << " is not declared\n";
 						exit(0);
 					}
-					
+
 				}
 				if (isIdentifier(op2)) {
 					Node* ref = Table.searchIdentifier(op2);
@@ -986,8 +982,69 @@ void readFile(string fileName) {
 	}
 }
 
+class TAC {
+public:
+	Token Operator;
+	TAC* Ref[2];
+	Token Operand1, Operand2;
+	TAC() {}
+	TAC(Token Op, Token Opr1, Token Opr2, TAC* R2 = NULL, TAC* R1 =
+		NULL) : Operator(Op),
+		Operand1(Opr1), Operand2(Opr2) {
+		Ref[0] = R1;
+		Ref[1] = R2;
+	}
+	void printTAC() {
+		cout << Operand1.getToken() << "\t"
+			<< Operand2.getToken() << "\t"
+			<< Operator.getToken() << "\t"
+			<< Ref[0] << "\t" << Ref[1] << endl;
+	}
+};
+vector<TAC> extractTAC(string postFix) {
+	vector<TAC> vectorTAC;
+	stack<string> strStack;
+	stack<TAC> TacStack;
+	string operand1, operand2, oper;
+	for (char i : postFix) {
+		TAC tak;
+		string temp(1, i);
+		if (isIdentifier(temp))
+			strStack.push(temp);
+		else if (isOperator(temp)) {
+			tak.Operator = temp;
+			if (!strStack.empty()) {
+				operand2 = strStack.top();
+				strStack.pop();
+				tak.Operand2 = operand2;
+				tak.Ref[1] = NULL;
+			}
+			else {
+				tak.Ref[1] = &TacStack.top();
+				TacStack.pop();
+			}
+			if (!strStack.empty()) {
+				operand1 = strStack.top();
+				strStack.pop();
+				tak.Operand1.setToken(operand1);
+				tak.Ref[0] = NULL;
+			}
+			else {
+				tak.Ref[0] = &TacStack.top();
+				TacStack.pop();
+			}
+			TacStack.push(tak);
+			vectorTAC.push_back(tak);
+		}
+	}
+	return vectorTAC;
+}
 
 int main() {
 	readFile("src1.txt");
+	cout << "Op1\tOp2\tOp\tRef1\t\t\tRef2\t\n";
+	//vector<TAC> tacVector = extractTAC(postFix);
+	//for (TAC i : tacVector)
+	//	//i.printTAC();
 	return 0;
 }
